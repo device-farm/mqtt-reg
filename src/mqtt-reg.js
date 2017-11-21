@@ -1,20 +1,28 @@
 const mqtt = require("mqtt");
 
-module.exports = (mqtt, device, register, cb, timeoutMs = 5000) => {
+module.exports = (broker, device, register, cb, timeoutMs = 5000) => {
 
-	const client = mqtt.connect(`mqtt://${mqtt}`);
+	const client = mqtt.connect(`mqtt://${broker}`);
 
 	let readTimeout;
 
 	let actual;
 	let desired;
 
+	function safeCb(actual, prev) {
+		try {
+			cb(actual, prev);			
+		} catch (e) {
+			console.error("Error in register callback", e);
+		}
+	}
+
 	function is(v) {
 		let prev = actual;
 		actual = v;
 
 		if (actual !== prev) {
-			cb(actual, prev);
+			safeCb(actual, prev);
 		}
 
 		if (actual !== undefined && desired === actual) {
@@ -59,7 +67,7 @@ module.exports = (mqtt, device, register, cb, timeoutMs = 5000) => {
 	});
 
 	get();
-	cb();
+	safeCb();
 
 	return {
 		set(value) {
