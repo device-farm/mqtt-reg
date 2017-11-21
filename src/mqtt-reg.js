@@ -1,84 +1,75 @@
 const mqtt = require("mqtt");
 
-module.exports = config => {
+module.exports = (mqtt, device, register, cb, timeoutMs = 5000) => {
 
-	console.info(config);
+	const client = mqtt.connect(`mqtt://${mqtt}`);
 
-	function register(device, ep, cb, timeoutMs = 5000) {
+	let readTimeout;
 
-		const client = mqtt.connect(`mqtt://${config.mqttHost}`);
+	let actual;
+	let desired;
 
-		let readTimeout;
+	function is(v) {
+		let prev = actual;
+		actual = v;
 
-		let actual;
-		let desired;
-
-		function is(v) {
-			let prev = actual;
-			actual = v;
-
-			if (actual !== prev) {
-				cb(actual, prev);
-			}
-
-			if (actual !== undefined && desired === actual) {
-				desired = undefined;
-			}
-
-			if (desired !== undefined) {
-				set();
-			} else {
-				if (actual === undefined) {
-					get();
-				}
-			}
-
+		if (actual !== prev) {
+			cb(actual, prev);
 		}
 
-		function resetTimeout() {
-			if (readTimeout) {
-				clearTimeout(readTimeout);
+		if (actual !== undefined && desired === actual) {
+			desired = undefined;
+		}
+
+		if (desired !== undefined) {
+			set();
+		} else {
+			if (actual === undefined) {
+				get();
 			}
-			readTimeout = setTimeout(() => {
-				is();
-			}, timeoutMs);
 		}
 
-		function set() {
-			resetTimeout();
-			client.publish(`${device}/register/${ep}/set`, JSON.stringify(desired));
-		}
-
-		function get() {
-			resetTimeout();
-			client.publish(`${device}/register/${ep}/get`);
-		}
-
-		client.subscribe(`${device}/register/${ep}/is`);
-
-		client.on("message", function (topic, message) {
-			resetTimeout();
-			let value = JSON.parse(message.toString());
-			is(value);
-		});
-
-		get();
-		cb();
-
-		return (v) => {
-			if (desired !== v && actual !== v) {
-				desired = v;
-				set();
-			}
-		};
 	}
 
+	function resetTimeout() {
+		if (readTimeout) {
+			clearTimeout(readTimeout);
+		}
+		readTimeout = setTimeout(() => {
+			is();
+		}, timeoutMs);
+	}
 
-	let temp = register("ESP", "Temperature", (value, prev) => {
-		console.info("Temp:", prev, "=>", value);
+	function set() {
+		resetTimeout();
+		client.publish(`${device}/register/${register}/set`, JSON.stringify(desired));
+	}
+
+	function get() {
+		resetTimeout();
+		client.publish(`${device}/register/${register}/get`);
+	}
+
+	client.subscribe(`${device}/register/${register}/is`);
+
+	client.on("message", function (topic, message) {
+		resetTimeout();
+		let value = JSON.parse(message.toString());
+		is(value);
 	});
 
-	temp(20);
-	
+	get();
+	cb();
 
+	return {
+		set(value) {
+			if (desired !== value && actual !== value) {
+				desired = value;
+				set();
+			}
+		},
+		actual() {
+			return actual;
+		}
+	};
 };
