@@ -5,5 +5,5 @@
 	"dependencies": {
 		"mqtt": "2.14.0"
 	},
-	"main": "src/mqtt-req.js"
+	"main": "src/mqtt-reg.js"
 }
