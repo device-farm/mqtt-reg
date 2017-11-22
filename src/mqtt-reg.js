@@ -1,6 +1,6 @@
 const mqtt = require("mqtt");
 
-module.exports = (broker, device, register, cb, timeoutMs = 5000) => {
+module.exports = (broker, device, register, cb, timeoutMs = 10000) => {
 
 	const client = mqtt.connect(`mqtt://${broker}`);
 
