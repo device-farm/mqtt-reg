@@ -55,7 +55,13 @@ module.exports = (broker, device, register, cb, timeoutMs = 10000) => {
 
 		firstTimeout = true;
 		let prev = actual;
-		actual = JSON.parse(message.toString());
+		
+		let str = message.toString();
+		if (str === "") {
+			actual = undefined;
+		} else {
+			actual = JSON.parse(str);
+		}
 
 		if (actual !== prev) {
 			safeCb(actual, prev);
