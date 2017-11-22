@@ -1,6 +1,6 @@
 {
 	"name": "@device.farm/mqtt-reg",
-	"version": "1.0.6",
+	"version": "1.0.7",
 	"author": "pb@drake.cz",
 	"dependencies": {
 		"mqtt": "2.14.0"
