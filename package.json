@@ -3,7 +3,7 @@
 	"version": "1.0.7",
 	"author": "pb@drake.cz",
 	"dependencies": {
-		"mqtt": "2.14.0"
+		"mqtt": "2.15.1"
 	},
 	"main": "src/mqtt-reg.js"
 }
