@@ -2,7 +2,7 @@ const mqtt = require("mqtt");
 
 module.exports = (broker, device, register, cb, timeoutMs = 10000) => {
 
-	const client = mqtt.connect(`mqtt://${broker}`);
+	const client = typeof broker === "string"? mqtt.connect(`mqtt://${broker}`): broker;
 
 	let timeout;
 	let firstTimeout;
