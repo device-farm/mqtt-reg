@@ -8,11 +8,11 @@ module.exports = (broker, register, cb, timeoutMs = 10000) => {
 	let firstTimeout;
 	let actual;
 	let desired;
+	let unset = true;
 
-
-	function safeCb(actual, prev) {
+	function safeCb(...args) {
 		try {
-			cb(actual, prev);
+			cb(...args);
 		} catch (e) {
 			console.error("Error in register callback", e);
 		}
@@ -30,7 +30,7 @@ module.exports = (broker, register, cb, timeoutMs = 10000) => {
 				let prev = actual;
 				actual = undefined;
 				if (actual !== prev) {
-					safeCb(actual, prev);
+					safeCb(actual, prev, false);
 				}				
 			}
 			
@@ -63,15 +63,16 @@ module.exports = (broker, register, cb, timeoutMs = 10000) => {
 			actual = JSON.parse(str);
 		}
 
-		if (actual !== prev) {
-			safeCb(actual, prev);
+		if (actual !== prev || unset) {
+			safeCb(actual, prev, false);
 		}
+		unset = false;
 
 		resetTimeout();
 	});
 
 	getOrSet();
-	safeCb();
+	safeCb(actual, undefined, true);
 	resetTimeout();
 
 	return {

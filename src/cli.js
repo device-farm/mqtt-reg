@@ -34,12 +34,10 @@ mqttreg <mqtt-broker> <reg-name> <reg-value>
 
             if (!regs[name]) {
                 regs[name] = meta;
-                console.info(name, "-", Object.entries(meta).map(([k, v]) => `${k}:${v}`).join(", "));
-                let firstCb = true;
-                mqttReg(mqttBroker, name, v => {
-                    if (!firstCb || v !== undefined) {
-                        firstCb = false;
-                        console.info(name, "=", v);
+                console.info(name, "-", Object.entries(meta).map(([k, v]) => `${k}:${v}`).join(", "));               
+                mqttReg(mqttBroker, name, (actual, prev, initial) => {
+                    if (!initial) {
+                        console.info(name, "=", actual);
                     }
                 });
             }
@@ -48,11 +46,9 @@ mqttreg <mqtt-broker> <reg-name> <reg-value>
     } else {
         if (regValue === undefined) {
 
-            let firstCb = true;
-            let reg = mqttReg(mqttBroker, regName, v => {
-                if (!firstCb || v !== undefined) {
-                    firstCb = false;
-                    console.info(JSON.stringify(v));
+            let reg = mqttReg(mqttBroker, regName, (actual, prev, initial) => {
+                if (!initial) {
+                    console.info(JSON.stringify(actual));
                     process.exit(0);
                 }
             });
@@ -60,8 +56,8 @@ mqttreg <mqtt-broker> <reg-name> <reg-value>
         } else {
             regValue = JSON.parse(regValue);
 
-            let reg = mqttReg(mqttBroker, regName, v => {
-                if (v === regValue) {
+            let reg = mqttReg(mqttBroker, regName, actual => {
+                if (actual === regValue) {
                     process.exit(0);
                 }
             });
