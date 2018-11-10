@@ -1,8 +1,8 @@
 const mqtt = require("mqtt");
 
-module.exports = (broker, device, register, cb, timeoutMs = 10000) => {
+module.exports = (broker, register, cb, timeoutMs = 10000) => {
 
-	const client = typeof broker === "string"? mqtt.connect(`mqtt://${broker}`): broker;
+	const client = mqtt.connect(`mqtt://${broker}`);
 
 	let timeout;
 	let firstTimeout;
@@ -43,13 +43,13 @@ module.exports = (broker, device, register, cb, timeoutMs = 10000) => {
 
 	function getOrSet() {
 		if (desired !== undefined) {
-			client.publish(`${device}/register/${register}/set`, JSON.stringify(desired));
+			client.publish(`register/${register}/set`, JSON.stringify(desired));
 		} else {
-			client.publish(`${device}/register/${register}/get`);
+			client.publish(`register/${register}/get`);
 		}
 	}
 
-	client.subscribe(`${device}/register/${register}/is`);
+	client.subscribe(`register/${register}/is`);
 
 	client.on("message", function (topic, message) {
 
