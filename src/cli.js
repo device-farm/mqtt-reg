@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const mqtt = require("mqtt");
+const deepEqual = require("fast-deep-equal");
 mqttReg = require("./mqtt-reg.js");
 mqttAdvertise = require("./mqtt-advertise.js");
 
@@ -57,7 +58,7 @@ mqttreg <mqtt-broker> <reg-name> <reg-value>
             regValue = JSON.parse(regValue);
 
             let reg = mqttReg(mqttBroker, regName, actual => {
-                if (actual === regValue) {
+                if (deepEqual(actual, regValue)) {
                     process.exit(0);
                 }
             });

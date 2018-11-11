@@ -1,4 +1,5 @@
 const mqtt = require("mqtt");
+const deepEqual = require("fast-deep-equal");
 
 module.exports = (broker, register, cb, timeoutMs = 10000) => {
 
@@ -29,7 +30,7 @@ module.exports = (broker, register, cb, timeoutMs = 10000) => {
 			if (!firstTimeout) {
 				let prev = actual;
 				actual = undefined;
-				if (actual !== prev) {
+				if (!deepEqual(actual, prev)) {
 					safeCb(actual, prev, false);
 				}				
 			}
@@ -63,7 +64,7 @@ module.exports = (broker, register, cb, timeoutMs = 10000) => {
 			actual = JSON.parse(str);
 		}
 
-		if (actual !== prev || unset) {
+		if (!deepEqual(actual, prev) || unset) {
 			safeCb(actual, prev, false);
 		}
 		unset = false;
@@ -77,7 +78,7 @@ module.exports = (broker, register, cb, timeoutMs = 10000) => {
 
 	return {
 		set(value) {
-			if (desired !== value && actual !== value) {
+			if (!deepEqual(desired, value) && !deepEqual(actual, value)) {
 				desired = value;
 				getOrSet();
 			}
