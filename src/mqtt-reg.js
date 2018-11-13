@@ -64,6 +64,10 @@ module.exports = (broker, register, cb, timeoutMs = 10000) => {
 			actual = JSON.parse(str);
 		}
 
+		if (deepEqual(actual, desired)) {
+			desired = undefined;
+		}
+
 		if (!deepEqual(actual, prev) || unset) {
 			safeCb(actual, prev, false);
 		}
