@@ -8,12 +8,13 @@ mqttAdvertise = require("./mqtt-advertise.js");
 [
     nodePath,
     scriptPath,
-    mqttBroker,
     regName,
     regValue
 ] = process.argv;
 
-if (!mqttBroker) {
+let mqttBroker = process.env.MQTT;
+
+if (!mqttBroker || regName === "-h" || regName === "--help") {
     console.info(
         `use:
 
@@ -25,6 +26,8 @@ mqttreg <mqtt-broker> <reg-name>
 
 to set specific register value as JSON:
 mqttreg <mqtt-broker> <reg-name> <reg-value>
+
+the tool expects MQTT environment variable to point to MQTT broker
 `
     );
 } else {

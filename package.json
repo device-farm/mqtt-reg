@@ -8,6 +8,6 @@
 	},
 	"main": "src/index.js",
 	"bin": {
-		"mqttreg": "src/cli.js"
+		"mqr": "src/cli.js"
 	}
 }
