@@ -18,7 +18,12 @@ module.exports = (broker, cb) => {
         }        
     });
 
-    client.on("connect", () => {
+    function advertiseChallenge() {
         client.publish("register/advertise!");
-    });
+    };
+
+    //TODO detect removals
+    //TODO subscribe to register/advertise! and avoid simultaneous challenges  
+    setInterval(advertiseChallenge, 10000);
+    client.on("connect", advertiseChallenge);
 }
