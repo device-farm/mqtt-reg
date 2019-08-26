@@ -1,12 +1,10 @@
-const mqtt = require("mqtt");
+const mqttMM = require("./mqtt-mm.js");
 
 module.exports = (broker, cb) => {
 
-    const client = mqtt.connect(`mqtt://${broker}`);
+    const client = mqttMM(`mqtt://${broker}`);
 
-    client.subscribe(`register/+/advertise`);
-
-    client.on("message", (topic, message) => {
+    client.subscribe(`register/+/advertise`, (topic, message) => {
         let name = topic.split("/")[1];
         let metaString = message.toString();
         
@@ -18,12 +16,26 @@ module.exports = (broker, cb) => {
         }        
     });
 
+    let timeout;
+
+    function resetTimeout() {
+		
+		if (timeout) {
+			clearTimeout(timeout);
+		}
+		
+		timeout = setTimeout(advertiseChallenge, 8000 + Math.random() * 4000);
+	}
+ 
+    client.subscribe("register/advertise!", (topic, message) => {
+        resetTimeout();
+    });
+
     function advertiseChallenge() {
         client.publish("register/advertise!");
+        resetTimeout();
     };
 
     //TODO detect removals
-    //TODO subscribe to register/advertise! and avoid simultaneous challenges  
-    setInterval(advertiseChallenge, 10000);
-    client.on("connect", advertiseChallenge);
+    advertiseChallenge();
 }

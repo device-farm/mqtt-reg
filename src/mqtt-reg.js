@@ -1,9 +1,13 @@
-const mqtt = require("mqtt");
+const mqttMM = require("./mqtt-mm.js");
 const deepEqual = require("fast-deep-equal");
 
-module.exports = (broker, register, cb, timeoutMs = 10000) => {
+module.exports = (broker, register, cb, timeoutMs) => {
 
-	const client = mqtt.connect(`mqtt://${broker}`);
+	if (!timeoutMs) {
+		timeoutMs = 8000 + Math.random() * 4000;
+	}
+
+	const client = mqttMM(`mqtt://${broker}`);
 
 	let timeout;
 	let firstTimeout;
@@ -50,9 +54,16 @@ module.exports = (broker, register, cb, timeoutMs = 10000) => {
 		}
 	}
 
-	client.subscribe(`register/${register}/is`);
+	// reset timeout if someone else is also trying to get/set the register 
+	client.subscribe(`register/${register}/get`, (topic, message) => {
+		resetTimeout();
+	});
 
-	client.on("message", function (topic, message) {
+	client.subscribe(`register/${register}/set`, (topic, message) => {
+		resetTimeout();
+	});
+
+	client.subscribe(`register/${register}/is`, (topic, message) => {
 
 		firstTimeout = true;
 		let prev = actual;
