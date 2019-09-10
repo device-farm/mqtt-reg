@@ -56,11 +56,15 @@ module.exports = (broker, register, cb, timeoutMs) => {
 
 	// reset timeout if someone else is also trying to get/set the register 
 	client.subscribe(`register/${register}/get`, (topic, message) => {
-		resetTimeout();
+		if (firstTimeout) {
+			resetTimeout();
+		}
 	});
 
 	client.subscribe(`register/${register}/set`, (topic, message) => {
-		resetTimeout();
+		if (firstTimeout) {
+			resetTimeout();
+		}
 	});
 
 	client.subscribe(`register/${register}/is`, (topic, message) => {
