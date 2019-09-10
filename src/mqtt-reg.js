@@ -14,6 +14,7 @@ module.exports = (broker, register, cb, timeoutMs) => {
 	let actual;
 	let desired;
 	let unset = true;
+	let askedByAnother = false;
 
 	function safeCb(...args) {
 		try {
@@ -24,6 +25,8 @@ module.exports = (broker, register, cb, timeoutMs) => {
 	}
 
 	function resetTimeout() {
+
+		askedByAnother = false;
 		
 		if (timeout) {
 			clearTimeout(timeout);
@@ -50,21 +53,19 @@ module.exports = (broker, register, cb, timeoutMs) => {
 		if (desired !== undefined) {
 			client.publish(`register/${register}/set`, JSON.stringify(desired));
 		} else {
-			client.publish(`register/${register}/get`);
+			if (!askedByAnother) {
+				client.publish(`register/${register}/get`);
+			}
 		}
 	}
 
 	// reset timeout if someone else is also trying to get/set the register 
 	client.subscribe(`register/${register}/get`, (topic, message) => {
-		if (firstTimeout) {
-			resetTimeout();
-		}
+		askedByAnother = true;
 	});
 
 	client.subscribe(`register/${register}/set`, (topic, message) => {
-		if (firstTimeout) {
-			resetTimeout();
-		}
+		askedByAnother = true;
 	});
 
 	client.subscribe(`register/${register}/is`, (topic, message) => {
