@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const mqtt = require("mqtt");
+const MqttMtl = require("@device.farm/mqtt-mtl");
 const deepEqual = require("fast-deep-equal");
 mqttReg = require("./mqtt-reg.js");
 mqttAdvertise = require("./mqtt-advertise.js");
@@ -12,9 +12,9 @@ mqttAdvertise = require("./mqtt-advertise.js");
     regValue
 ] = process.argv;
 
-let mqttBroker = process.env.MQTT;
+let brokerAddress = process.env.MQTT;
 
-if (!mqttBroker || regName === "-h" || regName === "--help") {
+if (!brokerAddress || regName === "-h" || regName === "--help") {
     console.info(
         `use:
 
@@ -32,14 +32,16 @@ the tool expects MQTT environment variable to point to MQTT broker
     );
 } else {
 
+    const mqttMtl = MqttMtl(`mqtt://${brokerAddress}`);   
+
     if (!regName) {
         let regs = {};
-        mqttAdvertise(mqttBroker, (name, meta) => {
+        mqttAdvertise(mqttMtl, (name, meta) => {
 
             if (!regs[name]) {
                 regs[name] = meta;
                 console.info(name, "-", Object.entries(meta).map(([k, v]) => `${k}:${v}`).join(", "));               
-                mqttReg(mqttBroker, name, (actual, prev, initial) => {
+                mqttReg(mqttMtl, name, (actual, prev, initial) => {
                     if (!initial) {
                         console.info(name, "=", actual);
                     }
@@ -50,7 +52,7 @@ the tool expects MQTT environment variable to point to MQTT broker
     } else {
         if (regValue === undefined) {
 
-            let reg = mqttReg(mqttBroker, regName, (actual, prev, initial) => {
+            mqttReg(mqttMtl, regName, (actual, prev, initial) => {
                 if (!initial) {
                     console.info(JSON.stringify(actual));
                     process.exit(0);
@@ -60,7 +62,7 @@ the tool expects MQTT environment variable to point to MQTT broker
         } else {
             regValue = JSON.parse(regValue);
 
-            let reg = mqttReg(mqttBroker, regName, actual => {
+            let reg = mqttReg(mqttMtl, regName, actual => {
                 if (deepEqual(actual, regValue)) {
                     process.exit(0);
                 }

@@ -1,13 +1,10 @@
-const mqtt = require("@device.farm/mqtt-mtl");
 const deepEqual = require("fast-deep-equal");
 
-module.exports = (broker, register, cb, timeoutMs) => {
+module.exports = (mqttMtl, register, cb, timeoutMs) => {
 
 	if (!timeoutMs) {
 		timeoutMs = 8000 + Math.random() * 4000;
 	}
-
-	const client = mqtt(`mqtt://${broker}`);
 
 	let timeout;
 	let firstTimeout;
@@ -51,24 +48,24 @@ module.exports = (broker, register, cb, timeoutMs) => {
 
 	function getOrSet() {
 		if (desired !== undefined) {
-			client.publish(`register/${register}/set`, JSON.stringify(desired));
+			mqttMtl.publish(`register/${register}/set`, JSON.stringify(desired));
 		} else {
 			if (!askedByAnother) {
-				client.publish(`register/${register}/get`);
+				mqttMtl.publish(`register/${register}/get`);
 			}
 		}
 	}
 
 	// reset timeout if someone else is also trying to get/set the register 
-	client.subscribe(`register/${register}/get`, (topic, message) => {
+	mqttMtl.subscribe(`register/${register}/get`, (topic, message) => {
 		askedByAnother = true;
 	});
 
-	client.subscribe(`register/${register}/set`, (topic, message) => {
+	mqttMtl.subscribe(`register/${register}/set`, (topic, message) => {
 		askedByAnother = true;
 	});
 
-	client.subscribe(`register/${register}/is`, (topic, message) => {
+	mqttMtl.subscribe(`register/${register}/is`, (topic, message) => {
 
 		firstTimeout = true;
 		let prev = actual;
