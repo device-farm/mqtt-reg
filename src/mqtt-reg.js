@@ -1,4 +1,4 @@
-const mqttMM = require("./mqtt-mm.js");
+const mqtt = require("@device.farm/mqtt-mtl");
 const deepEqual = require("fast-deep-equal");
 
 module.exports = (broker, register, cb, timeoutMs) => {
@@ -7,7 +7,7 @@ module.exports = (broker, register, cb, timeoutMs) => {
 		timeoutMs = 8000 + Math.random() * 4000;
 	}
 
-	const client = mqttMM(`mqtt://${broker}`);
+	const client = mqtt(`mqtt://${broker}`);
 
 	let timeout;
 	let firstTimeout;

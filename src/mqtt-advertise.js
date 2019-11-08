@@ -1,8 +1,8 @@
-const mqttMM = require("./mqtt-mm.js");
+const mqtt = require("@device.farm/mqtt-mtl");
 
 module.exports = (broker, cb) => {
 
-    const client = mqttMM(`mqtt://${broker}`);
+    const client = mqtt(`mqtt://${broker}`);
 
     client.subscribe(`register/+/advertise`, (topic, message) => {
         let name = topic.split("/")[1];

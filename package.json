@@ -3,6 +3,7 @@
 	"version": "1.0.18",
 	"author": "pb@drake.cz",
 	"dependencies": {
+		"@device.farm/mqtt-mtl": "^1.0.1",
 		"fast-deep-equal": "^2.0.1",
 		"mqtt": "^2.18.8"
 	},
