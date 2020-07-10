@@ -39,7 +39,7 @@ example:
 register/kitchen.lights/set true
 register/kitchen.display.text/set "Refrigerator door open"
 register/livingroom.curtain.position/set 50
-register/livingroom.lights.set/set [50,50,100]
+register/livingroom.lights/set [50,50,100]
 ```
 
 #### register/(registername)/is
