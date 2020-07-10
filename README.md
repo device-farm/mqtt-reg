@@ -7,11 +7,11 @@ Register R/W over MQTT
 
 ### Register names
 
-Each register is identified by a string name. By convention the name is lowercase string without spaces with optionally with a logical path separated by dots, e.g. `kitchen.temperature`, `kitchen.humidity` or `buildingA.floor0.room10.lights`
+Each register is identified by a string name. By convention the name is lowercase string without spaces. Optionally the name can be formed as a logical path separated by dots, e.g. `kitchen.temperature`, `kitchen.humidity` or `buildingA.floor0.room10.lights`
 
 ### Register values
 
-By protocol register values may be any valid JSON type, i.e. number, string, boolean, object or array. Null values are passed as empty (zero-length) messages. Meaning of null (or undefined on js API level) values is, that the register is unavailable.
+Register value may be any valid JSON type, i.e. number, string, boolean, object or array. Null values are passed as empty (zero-length) messages. Meaning of null (or undefined on js API level) values is, that the register is unavailable.
 
 ### MQTT topics
 
