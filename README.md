@@ -23,12 +23,24 @@ message format: none
 
 Register MUST listen for this topic and immediately send current state of the register by publishing `is` topic.
 
+example:
+```
+register/kitchen.temperature/get (no message data)
+```
+
 #### register/(registername)/set
 
 message format: any valid JSON value
 
 This is mandatory topic for writable registers. Register MAY listen for this topic and set the register value to the decoded JSON data from message. If register listens for the topic, then it MUST publish `is` topic with the new state. In some situations the value sent in `is` topic is not exactly the value received in `set` topic - this may happen if the value to be set is out of range and the register clips the value to an acceptable value.
 
+example:
+```
+register/kitchen.lights/set true
+register/kitchen.display.text/set "Refrigerator door open"
+register/livingroom.curtain.position/set 50
+register/livingroom.lights.set/set [50,50,100]
+```
 
 #### register/(registername)/is
 
@@ -41,6 +53,12 @@ Register MUST publish this topic in following situations:
 
 Message data is JSON encoded register value.
 
+example:
+```
+register/kitchen.lights/is true
+register/kitchen.temperature/is 24.3
+```
+
 #### register/(registername)/advertise
 
 message format: JSON object
@@ -49,6 +67,8 @@ Register MAY publish this topic in order to let other parties know about registe
 
 - `device` a device identifier, which may serve to logically group registers in a graphical UI.
 - `type` one of data type identifiers: `number`, `string`, `boolean`, `array`, `object`
+- `unit` name of a unit if the register represents physical property, e.g. `°C`.
+
 
 ## API
 
