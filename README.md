@@ -63,7 +63,7 @@ register/kitchen.temperature/is 24.3
 
 message format: JSON object
 
-Register MAY publish this topic in order to let other parties know about register presence. Message send with this topic is JSON encoded object with details about register. Register SHOULD set these properties in published data:
+Register MAY publish this topic in order to let other parties know about register presence. Message sent with this topic is JSON encoded object with details about register. Register SHOULD set these properties in published data:
 
 - `device` a device identifier, which may serve to logically group registers in a graphical UI.
 - `type` one of data type identifiers: `number`, `string`, `boolean`, `array`, `object`
